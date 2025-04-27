@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ProseMirror {
+  @apply text-slate-800 dark:text-slate-100 p-4;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-slate-400 dark:text-slate-500;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+.ProseMirror > * + * {
+  margin-top: 0.75em;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding: 0 1rem;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+  line-height: 1.1;
+}
+
+.ProseMirror code {
+  @apply bg-[#1e1e1e] text-white dark:text-slate-200 rounded px-2 py-0.5 font-mono text-sm;
+}
+
+.ProseMirror pre {
+  @apply bg-[#1e1e1e] text-white dark:text-slate-200 rounded-lg p-4 my-4;
+  font-family: 'JetBrainsMono', monospace;
+  position: relative;
+}
+
+.ProseMirror pre code {
+  display: block;
+  font-size: 0.9em;
+  line-height: 1.5;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.ProseMirror pre::before {
+  content: attr(data-language);
+  @apply text-xs text-slate-400 absolute top-2 right-4;
+}
+
+/* Syntax highlighting */
+.hljs-keyword {
+  @apply text-[#c586c0]; /* Pink for keywords */
+}
+
+.hljs-string {
+  @apply text-[#ce9178]; /* Orange for strings */
+}
+
+.hljs-function {
+  @apply text-[#dcdcaa]; /* Yellow for functions */
+}
+
+.hljs-property {
+  @apply text-[#9cdcfe]; /* Light blue for properties */
+}
+
+.hljs-number {
+  @apply text-[#b5cea8]; /* Green for numbers */
+}
+
+.hljs-operator,
+.hljs-punctuation {
+  @apply text-white; /* White for operators and punctuation */
+}
+
+.hljs-comment {
+  @apply text-[#6a9955]; /* Green for comments */
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+}
+
+.ProseMirror blockquote {
+  @apply pl-4 border-l-4 border-slate-300 dark:border-slate-600 italic;
+}
+
+.ProseMirror hr {
+  @apply border-slate-200 dark:border-slate-700 my-4;
+}
+
+/* Table Styles */
+.ProseMirror table {
+  @apply border-collapse w-full my-4;
+}
+
+.ProseMirror table td,
+.ProseMirror table th {
+  @apply border border-slate-300 dark:border-slate-600 p-2;
+  position: relative;
+  min-width: 100px;
+}
+
+.ProseMirror table th {
+  @apply bg-slate-100 dark:bg-slate-700 font-semibold;
+}
+
+.ProseMirror table .selectedCell:after {
+  @apply bg-blue-200 dark:bg-blue-900 opacity-20;
+  content: '';
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
