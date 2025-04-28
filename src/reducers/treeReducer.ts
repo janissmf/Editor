@@ -5,6 +5,18 @@ export const treeReducer = (state: any, action: NodeAction) => {
   const newTree = cloneTree(state.tree);
   
   switch (action.type) {
+    case 'INITIALIZE': {
+      const { tree } = action;
+      return {
+        ...state,
+        tree,
+        rootNode: tree,
+        currentPath: [{ id: tree.id, label: tree.label }],
+        history: [tree],
+        historyIndex: 0
+      };
+    }
+
     case 'ADD_CHILD': {
       const { parentId, newNode } = action;
       const parentNode = findNode(newTree, parentId);
@@ -13,10 +25,7 @@ export const treeReducer = (state: any, action: NodeAction) => {
         parentNode.children.push(newNode);
         parentNode.isExpanded = true;
 
-        // Update history
         const newHistory = [...state.history.slice(0, state.historyIndex + 1), newTree];
-        
-        // Update rootNode if adding to current root
         const updatedRootNode = findNode(newTree, state.rootNode.id);
         
         return {
@@ -36,16 +45,10 @@ export const treeReducer = (state: any, action: NodeAction) => {
       
       if (node) {
         node.label = label;
-        
-        // Update history
         const newHistory = [...state.history.slice(0, state.historyIndex + 1), newTree];
-        
-        // Update current path if the edited node is in the path
         const updatedPath = state.currentPath.map((item: any) => 
           item.id === id ? { ...item, label } : item
         );
-        
-        // Update rootNode if editing current root
         const updatedRootNode = id === state.rootNode.id 
           ? { ...state.rootNode, label }
           : state.rootNode;
@@ -68,11 +71,7 @@ export const treeReducer = (state: any, action: NodeAction) => {
       
       if (node) {
         node.description = description;
-        
-        // Update history
         const newHistory = [...state.history.slice(0, state.historyIndex + 1), newTree];
-        
-        // Update rootNode if updating current root
         const updatedRootNode = id === state.rootNode.id 
           ? { ...state.rootNode, description }
           : state.rootNode;
@@ -99,11 +98,7 @@ export const treeReducer = (state: any, action: NodeAction) => {
       
       if (parentNode) {
         parentNode.children = parentNode.children.filter(child => child.id !== id);
-        
-        // Update history
         const newHistory = [...state.history.slice(0, state.historyIndex + 1), newTree];
-        
-        // If deleted node was the root, navigate up
         const shouldNavigateUp = id === state.rootNode.id;
         const newRootId = shouldNavigateUp ? parentNode.id : state.rootNode.id;
         const newRootNode = findNode(newTree, newRootId);

@@ -4,6 +4,7 @@ export interface TreeNode {
   description?: string;
   children: TreeNode[];
   isExpanded?: boolean;
+  parent_id?: string | null;
 }
 
 export interface NodePath {
@@ -12,6 +13,7 @@ export interface NodePath {
 }
 
 export type NodeAction = 
+  | { type: 'INITIALIZE'; tree: TreeNode }
   | { type: 'ADD_CHILD'; parentId: string; newNode: TreeNode }
   | { type: 'EDIT_NODE'; id: string; label: string }
   | { type: 'UPDATE_DESCRIPTION'; id: string; description: string }
