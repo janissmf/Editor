@@ -1,41 +1,52 @@
 import axios from 'axios';
 import { TreeNode } from '../types';
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Add auth token to requests
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const api = {
-  // Get all nodes
   async getNodes() {
-    const response = await axios.get(`${API_URL}/nodes`);
+    const response = await axiosInstance.get('/nodes');
     return response.data;
   },
 
-  // Get a single node by ID
   async getNode(id: string) {
-    const response = await axios.get(`${API_URL}/nodes/${id}`);
+    const response = await axiosInstance.get(`/nodes/${id}`);
     return response.data;
   },
 
-  // Create a new node
   async createNode(node: Omit<TreeNode, 'id'>) {
-    const response = await axios.post(`${API_URL}/nodes`, node);
+    const response = await axiosInstance.post('/nodes', node);
     return response.data;
   },
 
-  // Update a node
   async updateNode(id: string, updates: Partial<TreeNode>) {
-    const response = await axios.patch(`${API_URL}/nodes/${id}`, updates);
+    const response = await axiosInstance.patch(`/nodes/${id}`, updates);
     return response.data;
   },
 
-  // Delete a node
   async deleteNode(id: string) {
-    await axios.delete(`${API_URL}/nodes/${id}`);
+    await axiosInstance.delete(`/nodes/${id}`);
   },
 
-  // Get children nodes
   async getChildren(parentId: string) {
-    const response = await axios.get(`${API_URL}/nodes/${parentId}/children`);
+    const response = await axiosInstance.get(`/nodes/${parentId}/children`);
     return response.data;
   }
 };

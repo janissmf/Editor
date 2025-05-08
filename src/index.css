@@ -3,11 +3,29 @@
 @tailwind utilities;
 
 .ProseMirror {
-  @apply text-slate-800 dark:text-slate-100 p-4;
+  @apply text-foreground p-4;
+}
+
+.ProseMirror p {
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+.ProseMirror li {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.ProseMirror h2 {
+  margin-top: 24px;
+}
+
+.ProseMirror h3 {
+  margin-top: 15px;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
-  @apply text-slate-400 dark:text-slate-500;
+  @apply text-muted-foreground;
   content: attr(data-placeholder);
   float: left;
   height: 0;
@@ -37,11 +55,11 @@
 }
 
 .ProseMirror code {
-  @apply bg-[#1e1e1e] text-white dark:text-slate-200 rounded px-2 py-0.5 font-mono text-sm;
+  @apply bg-[#0F172A] text-foreground rounded px-2 py-0.5 font-mono text-sm;
 }
 
 .ProseMirror pre {
-  @apply bg-[#1e1e1e] text-white dark:text-slate-200 rounded-lg p-4 my-4;
+  @apply bg-[#0F172A] text-foreground rounded-lg p-4 my-4;
   font-family: 'JetBrainsMono', monospace;
   position: relative;
 }
@@ -56,7 +74,7 @@
 
 .ProseMirror pre::before {
   content: attr(data-language);
-  @apply text-xs text-slate-400 absolute top-2 right-4;
+  @apply text-xs text-muted-foreground absolute top-2 right-4;
 }
 
 /* Syntax highlighting */
@@ -82,7 +100,7 @@
 
 .hljs-operator,
 .hljs-punctuation {
-  @apply text-white; /* White for operators and punctuation */
+  @apply text-foreground;
 }
 
 .hljs-comment {
@@ -92,14 +110,18 @@
 .ProseMirror img {
   max-width: 100%;
   height: auto;
+  @apply rounded-lg my-4;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .ProseMirror blockquote {
-  @apply pl-4 border-l-4 border-slate-300 dark:border-slate-600 italic;
+  @apply pl-4 border-l-4 border-muted italic;
 }
 
 .ProseMirror hr {
-  @apply border-slate-200 dark:border-slate-700 my-4;
+  @apply border-muted my-4;
 }
 
 /* Table Styles */
@@ -109,17 +131,17 @@
 
 .ProseMirror table td,
 .ProseMirror table th {
-  @apply border border-slate-300 dark:border-slate-600 p-2;
+  @apply border border-muted p-2;
   position: relative;
   min-width: 100px;
 }
 
 .ProseMirror table th {
-  @apply bg-slate-100 dark:bg-slate-700 font-semibold;
+  @apply bg-muted font-semibold;
 }
 
 .ProseMirror table .selectedCell:after {
-  @apply bg-blue-200 dark:bg-blue-900 opacity-20;
+  @apply bg-blue-900 opacity-20;
   content: '';
   left: 0;
   right: 0;

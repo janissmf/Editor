@@ -86,3 +86,48 @@ export const getMaxDepth = (tree: TreeNode): number => {
   const childDepths = tree.children.map(child => getMaxDepth(child));
   return 1 + Math.max(...childDepths);
 };
+
+// Build tree from flat nodes array
+export const buildTreeFromNodes = (nodes: any[]): TreeNode => {
+  const initialRoot: TreeNode = {
+    id: 'root',
+    label: 'Root Node',
+    description: 'Welcome to NodeTree! This is the root node of your tree.',
+    children: [],
+    isExpanded: true
+  };
+
+  if (!nodes || nodes.length === 0) return initialRoot;
+
+  const nodeMap = new Map();
+  
+  // First pass: Create all nodes
+  nodes.forEach(node => {
+    nodeMap.set(node._id, {
+      id: node._id,
+      label: node.label,
+      description: node.description || '',
+      children: [],
+      isExpanded: node.is_expanded ?? true
+    });
+  });
+
+  // Second pass: Build tree structure
+  nodes.forEach(node => {
+    if (node.parent_id) {
+      const parent = nodeMap.get(node.parent_id);
+      if (parent) {
+        parent.children.push(nodeMap.get(node._id));
+      }
+    }
+  });
+
+  // Find root nodes and add them to the tree
+  const rootNodes = nodes.filter(node => !node.parent_id);
+  const tree = {
+    ...initialRoot,
+    children: rootNodes.map(node => nodeMap.get(node._id))
+  };
+
+  return tree;
+};

@@ -12,8 +12,14 @@ export interface NodePath {
   label: string;
 }
 
+export interface RootNode {
+  id: string;
+  label: string;
+}
+
 export type NodeAction = 
   | { type: 'INITIALIZE'; tree: TreeNode }
+  | { type: 'ADD_ROOT'; node: TreeNode }
   | { type: 'ADD_CHILD'; parentId: string; newNode: TreeNode }
   | { type: 'EDIT_NODE'; id: string; label: string }
   | { type: 'UPDATE_DESCRIPTION'; id: string; description: string }

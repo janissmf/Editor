@@ -1,0 +1,35 @@
+services:
+  frontend:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      editor_network:
+        ipv4_address: 172.60.0.4
+
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGODB_URI=mongodb://65.109.0.254:27017/node-tree
+      - JWT_SECRET=d789c123a456b789c123d456e789f123g456h789i123j456k789l123m456n789o123p
+      - AUTH_ENABLED=true
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "https://editor.tikla-eksperts.lv/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      editor_network:
+        ipv4_address: 172.60.0.3
+
+networks:
+  editor_network:
+    external: true

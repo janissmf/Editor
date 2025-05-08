@@ -17,6 +17,19 @@ export const treeReducer = (state: any, action: NodeAction) => {
       };
     }
 
+    case 'ADD_ROOT': {
+      const { node } = action;
+      newTree.children = [...newTree.children, node];
+      const newHistory = [...state.history.slice(0, state.historyIndex + 1), newTree];
+      
+      return {
+        ...state,
+        tree: newTree,
+        history: newHistory,
+        historyIndex: newHistory.length - 1
+      };
+    }
+
     case 'ADD_CHILD': {
       const { parentId, newNode } = action;
       const parentNode = findNode(newTree, parentId);

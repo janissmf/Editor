@@ -18,8 +18,16 @@ const nodeSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  }
 }, {
   timestamps: true,
 });
+
+nodeSchema.index({ user_id: 1 });
+nodeSchema.index({ parent_id: 1 });
 
 export const Node = mongoose.model('Node', nodeSchema);
