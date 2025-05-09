@@ -112,7 +112,7 @@ export const buildTreeFromNodes = (nodes: any[]): TreeNode => {
     });
   });
 
-  // Second pass: Build tree structure
+  // Second pass: Build tree structure and sort children alphabetically
   nodes.forEach(node => {
     if (node.parent_id) {
       const parent = nodeMap.get(node.parent_id);
@@ -122,12 +122,25 @@ export const buildTreeFromNodes = (nodes: any[]): TreeNode => {
     }
   });
 
+  // Sort children alphabetically at each level
+  const sortChildrenAlphabetically = (node: TreeNode) => {
+    node.children.sort((a, b) => a.label.localeCompare(b.label));
+    node.children.forEach(sortChildrenAlphabetically);
+  };
+
   // Find root nodes and add them to the tree
-  const rootNodes = nodes.filter(node => !node.parent_id);
+  const rootNodes = nodes
+    .filter(node => !node.parent_id)
+    .map(node => nodeMap.get(node._id))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
   const tree = {
     ...initialRoot,
-    children: rootNodes.map(node => nodeMap.get(node._id))
+    children: rootNodes
   };
+
+  // Sort all children recursively
+  sortChildrenAlphabetically(tree);
 
   return tree;
 };

@@ -231,7 +231,6 @@ const NodeTree: React.FC = () => {
         }
     }, [isEditing, editor]);
 
-
     const handleNodeSelect = (node: TreeNodeType) => {
         setSelectedNode(node);
         setShowDetails(true);
@@ -332,7 +331,6 @@ const NodeTree: React.FC = () => {
                                 deleteRow={deleteRow}
                                 deleteTable={deleteTable}
                             />
-
                         )}
                         <EditorContent
                             editor={editor}
@@ -553,6 +551,7 @@ const NodeTree: React.FC = () => {
                         <button
                             onClick={logOut}
                             className="p-2 rounded-md hover:bg-muted transition-colors"
+                            
                             title="LogOut"
                         >
                             <LogOut size={18} />

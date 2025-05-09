@@ -19,6 +19,8 @@ export default {
           css: {
             maxWidth: 'none',
             color: '#E2E8F0',
+            fontSize: '16px',
+            lineHeight: '1.5',
             a: {
               color: '#3b82f6',
               '&:hover': {
@@ -27,13 +29,18 @@ export default {
             },
             p: {
               color: 'inherit',
+              fontSize: '16px',
+              lineHeight: '1.5',
             },
             li: {
               color: 'inherit',
+              fontSize: '16px',
+              lineHeight: '1.5',
             },
             blockquote: {
               color: 'inherit',
               borderLeftColor: '#1E293B',
+              fontSize: '16px',
             },
             'h1,h2,h3,h4': {
               color: 'inherit',

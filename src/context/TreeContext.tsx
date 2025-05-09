@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useReducer, useState, ReactNode, useEffect, useCallback } from 'react';
 import { TreeNode, NodeAction, NodePath } from '../types';
-import { v4 as uuidv4 } from 'uuid';
-import { treeReducer } from '../reducers/treeReducer';
 import { findNode, getNodePath } from '../utils/treeUtils';
 import { api } from '../services/api';
+import { buildTreeFromNodes } from '../utils/treeUtils';
+import { treeReducer } from '../reducers/treeReducer';
 
 // Initial tree structure
 const initialRoot: TreeNode = {
@@ -25,7 +25,7 @@ interface TreeState {
 interface TreeContextProps {
   state: TreeState;
   dispatch: React.Dispatch<NodeAction>;
-  addNode: (parentId: string | null, label: string) => Promise<void>;
+  addNode: (parentId: string | null, label: string) => Promise<TreeNode>;
   editNode: (id: string, label: string) => Promise<void>;
   updateDescription: (id: string, description: string) => Promise<void>;
   deleteNode: (id: string, parentId?: string) => Promise<void>;
@@ -71,42 +71,6 @@ export const TreeProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => window.removeEventListener('popstate', handleUrlChange);
   }, [state.tree]);
 
-  const buildTreeFromNodes = useCallback((nodes: any[]): TreeNode => {
-    if (!nodes || nodes.length === 0) return initialRoot;
-
-    const nodeMap = new Map();
-    
-    // First pass: Create all nodes
-    nodes.forEach(node => {
-      nodeMap.set(node._id, {
-        id: node._id,
-        label: node.label,
-        description: node.description || '',
-        children: [],
-        isExpanded: node.is_expanded ?? true
-      });
-    });
-
-    // Second pass: Build tree structure
-    nodes.forEach(node => {
-      if (node.parent_id) {
-        const parent = nodeMap.get(node.parent_id);
-        if (parent) {
-          parent.children.push(nodeMap.get(node._id));
-        }
-      }
-    });
-
-    // Find root nodes and add them to the tree
-    const rootNodes = nodes.filter(node => !node.parent_id);
-    const tree = {
-      ...initialRoot,
-      children: rootNodes.map(node => nodeMap.get(node._id))
-    };
-
-    return tree;
-  }, []);
-
   // Load initial data
   useEffect(() => {
     let mounted = true;
@@ -138,17 +102,24 @@ export const TreeProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => {
       mounted = false;
     };
-  }, [buildTreeFromNodes]);
+  }, []);
 
-  const addNode = useCallback(async (parentId: string | null, label: string) => {
+  const addNode = useCallback(async (parentId: string | null, label: string): Promise<TreeNode> => {
+    if (!label || label.trim() === '') {
+      throw new Error('Label is required');
+    }
+
     try {
-      const newNode = await api.createNode({
-        label,
+      const parent_id = parentId === 'root' ? null : parentId;
+      
+      const newNodeData = {
+        label: label.trim(),
         description: '',
-        parent_id: parentId === 'root' ? null : parentId,
-        is_expanded: true,
-        children: []
-      });
+        parent_id,
+        is_expanded: true
+      };
+
+      const newNode = await api.createNode(newNodeData);
       
       const nodeToAdd = {
         id: newNode._id,
@@ -158,15 +129,13 @@ export const TreeProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isExpanded: newNode.is_expanded
       };
 
-      if (!parentId) {
-        // Adding a root node
+      if (!parentId || parentId === 'root') {
         dispatch({ type: 'ADD_ROOT', node: nodeToAdd });
       } else {
-        // Adding a child node
         dispatch({ type: 'ADD_CHILD', parentId, newNode: nodeToAdd });
       }
 
-      // Refresh the tree to ensure all nodes are up to date
+      // Refresh the tree
       const nodes = await api.getNodes();
       const updatedTree = buildTreeFromNodes(nodes);
       dispatch({ type: 'INITIALIZE', tree: updatedTree });
@@ -176,18 +145,16 @@ export const TreeProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error adding node:', error);
       throw error;
     }
-  }, [buildTreeFromNodes]);
+  }, [state.tree]);
 
   const editNode = useCallback(async (id: string, label: string) => {
     try {
       await api.updateNode(id, { label });
       
-      // Refresh the tree to ensure all nodes are up to date
       const nodes = await api.getNodes();
       const updatedTree = buildTreeFromNodes(nodes);
       dispatch({ type: 'INITIALIZE', tree: updatedTree });
       
-      // Update the current node if it's being edited
       if (id === state.rootNode.id) {
         const updatedNode = findNode(updatedTree, id);
         if (updatedNode) {
@@ -198,7 +165,7 @@ export const TreeProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error editing node:', error);
       throw error;
     }
-  }, [buildTreeFromNodes, state.rootNode.id]);
+  }, [state.rootNode.id]);
 
   const updateDescription = useCallback(async (id: string, description: string) => {
     dispatch({ type: 'UPDATE_DESCRIPTION', id, description });
@@ -234,7 +201,6 @@ export const TreeProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       await api.deleteNode(id);
       
-      // Refresh the tree to ensure all nodes are up to date
       const nodes = await api.getNodes();
       const updatedTree = buildTreeFromNodes(nodes);
       dispatch({ type: 'INITIALIZE', tree: updatedTree });
@@ -242,7 +208,7 @@ export const TreeProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('Error deleting node:', error);
       throw error;
     }
-  }, [buildTreeFromNodes]);
+  }, []);
 
   const setRootNode = useCallback((id: string) => {
     const node = findNode(state.tree, id);

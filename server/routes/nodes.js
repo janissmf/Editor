@@ -16,7 +16,7 @@ const isMongoConnected = () => mongoose.connection.readyState === 1;
 router.get('/', async (req, res) => {
   try {
     if (isMongoConnected()) {
-      const nodes = await Node.find({ user_id: req.user._id }).sort({ createdAt: 1 });
+      const nodes = await Node.find({ user_id: req.user._id }).sort({ order: 1, createdAt: 1 });
       res.json(nodes);
     } else {
       const nodes = await store.getAllNodes();
@@ -56,6 +56,7 @@ router.post('/', async (req, res) => {
       description: req.body.description || '',
       parent_id: req.body.parent_id,
       is_expanded: req.body.is_expanded ?? true,
+      order: req.body.order || 0,
       user_id: req.user._id,
     };
 
@@ -80,6 +81,7 @@ router.patch('/:id', async (req, res) => {
     if (req.body.description !== undefined) updates.description = req.body.description;
     if (req.body.parent_id !== undefined) updates.parent_id = req.body.parent_id;
     if (req.body.is_expanded !== undefined) updates.is_expanded = req.body.is_expanded;
+    if (req.body.order !== undefined) updates.order = req.body.order;
 
     if (isMongoConnected()) {
       const updatedNode = await Node.findOneAndUpdate(
@@ -134,7 +136,7 @@ router.get('/:id/children', async (req, res) => {
       const children = await Node.find({ 
         parent_id: req.params.id,
         user_id: req.user._id 
-      }).sort({ createdAt: 1 });
+      }).sort({ order: 1, createdAt: 1 });
       res.json(children);
     } else {
       const children = await store.getChildren(req.params.id);

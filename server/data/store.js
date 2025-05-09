@@ -57,12 +57,14 @@ export const store = {
   // Create node
   async createNode(nodeData) {
     const data = await readStore();
+    
     const newNode = {
       ...nodeData,
       _id: Math.random().toString(36).substr(2, 9),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
+
     data.nodes.push(newNode);
     await writeStore(data);
     return newNode;
@@ -110,6 +112,8 @@ export const store = {
   // Get children nodes
   async getChildren(parentId) {
     const data = await readStore();
-    return data.nodes.filter(node => node.parent_id === parentId);
+    return data.nodes
+      .filter(node => node.parent_id === parentId)
+      .sort((a, b) => a.label.localeCompare(b.label));
   }
 };

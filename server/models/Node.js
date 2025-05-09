@@ -18,6 +18,10 @@ const nodeSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  order: {
+    type: Number,
+    default: 0,
+  },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -29,5 +33,6 @@ const nodeSchema = new mongoose.Schema({
 
 nodeSchema.index({ user_id: 1 });
 nodeSchema.index({ parent_id: 1 });
+nodeSchema.index({ order: 1 });
 
 export const Node = mongoose.model('Node', nodeSchema);

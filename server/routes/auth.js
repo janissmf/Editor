@@ -11,7 +11,7 @@ const isMongoConnected = () => mongoose.connection.readyState === 1;
 router.post('/google', async (req, res) => {
   try {
     const { credential } = req.body;
-
+    
     if (!credential) {
       return res.status(400).json({ message: 'No credential provided' });
     }
@@ -27,7 +27,7 @@ router.post('/google', async (req, res) => {
     }
 
     let user;
-
+    
     if (isMongoConnected()) {
       user = await User.findOne({ email: payload.email });
 
@@ -65,9 +65,9 @@ router.post('/google', async (req, res) => {
     });
   } catch (error) {
     console.error('Auth error:', error);
-    res.status(401).json({
+    res.status(401).json({ 
       message: 'Authentication failed',
-      error: error.message
+      error: error.message 
     });
   }
 });
@@ -85,9 +85,9 @@ router.get('/user', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('User verification error:', error);
-    res.status(401).json({
+    res.status(401).json({ 
       message: 'User verification failed',
-      error: error.message
+      error: error.message 
     });
   }
 });

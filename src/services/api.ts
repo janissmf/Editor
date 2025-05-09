@@ -31,12 +31,15 @@ export const api = {
     return response.data;
   },
 
-  async createNode(node: Omit<TreeNode, 'id'>) {
+  async createNode(node: Omit<TreeNode, 'id'> & { order?: number }) {
     const response = await axiosInstance.post('/nodes', node);
     return response.data;
   },
 
-  async updateNode(id: string, updates: Partial<TreeNode>) {
+  async updateNode(id: string, updates: Partial<TreeNode> & { 
+    order?: number;
+    parent_id?: string | null;
+  }) {
     const response = await axiosInstance.patch(`/nodes/${id}`, updates);
     return response.data;
   },
